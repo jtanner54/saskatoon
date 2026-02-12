@@ -18,16 +18,11 @@ After the 15th time doing this dance, I snapped and built Saskatoon. Now I just 
 - **Re-enters fullscreen** — Disney+ drops you out of fullscreen between episodes. Saskatoon puts you right back in, automatically. It clicks Disney+'s own fullscreen button (via shadow DOM) so the player controls still work properly.
 - **Re-enables subtitles** — If you had subtitles on, they stay on. Saskatoon remembers your subtitle language and re-applies it after each transition.
 
-## Installation
+## Install
 
-### 1. Load the Extension
+**[Get Saskatoon on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/saskatoon/)**
 
-1. Open `about:debugging#/runtime/this-firefox` in Firefox
-2. Click **"Load Temporary Add-on..."**
-3. Select the `manifest.json` file from this directory
-4. The Saskatoon icon will appear in your toolbar
-
-### 2. One-Time Firefox Setup (for auto-fullscreen)
+### One-Time Firefox Setup (for auto-fullscreen)
 
 A setup guide will open automatically on first install. The short version:
 
@@ -37,9 +32,7 @@ A setup guide will open automatically on first install. The short version:
 
 This allows Saskatoon to programmatically restore fullscreen without requiring a click. Without this, Firefox blocks all programmatic fullscreen requests for security reasons.
 
-### 3. Watch Disney+
-
-Navigate to Disney+, start a series, enter fullscreen, and let Saskatoon handle the rest.
+Then just head to Disney+, start a series, enter fullscreen, and let Saskatoon handle the rest.
 
 ## Settings
 
