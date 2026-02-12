@@ -54,17 +54,6 @@
     playerContainer: '[data-testid="web-player"]',
   };
 
-  function queryFirst(selectorOrArray) {
-    if (Array.isArray(selectorOrArray)) {
-      for (const sel of selectorOrArray) {
-        const el = document.querySelector(sel);
-        if (el) return el;
-      }
-      return null;
-    }
-    return document.querySelector(selectorOrArray);
-  }
-
   function findElementByText(selectors, ...texts) {
     const elements = document.querySelectorAll(selectors);
     for (const el of elements) {
@@ -83,13 +72,9 @@
   // ==========================================================
 
   function tryClickNextEpisode() {
-    if (!CONFIG.autoNextEpisode) {
-      console.log("[Saskatoon] autoNextEpisode is OFF, skipping");
-      return false;
-    }
+    if (!CONFIG.autoNextEpisode) return false;
     if (Date.now() - state.lastClickTime < CONFIG.CLICK_COOLDOWN_MS) return false;
 
-    // Try multiple selectors for the next episode / skip button
     let btn = document.querySelector(SELECTORS.upNextPlayButton);
     if (!btn) btn = document.querySelector(SELECTORS.skipButton);
     if (!btn) btn = document.querySelector(".skip__button.body-copy");
@@ -97,10 +82,8 @@
     if (!btn) btn = findElementByText("button, div, a, span", "next episode", "play next", "continue watching", "skip");
 
     if (btn) {
-      console.log("[Saskatoon] Clicking next episode button:", btn.tagName, btn.className, btn.textContent.trim().substring(0, 50));
       state.wasFullscreen = !!document.fullscreenElement || state.userEnteredFullscreen;
       state.needsFullscreenRestore = state.wasFullscreen;
-      console.log("[Saskatoon] wasFullscreen:", state.wasFullscreen);
       btn.click();
       state.lastClickTime = Date.now();
       state.userEnteredFullscreen = false;
@@ -129,7 +112,6 @@
                || toggleFs.shadowRoot.querySelector("button");
       if (btn) {
         btn.click();
-        console.log("[Saskatoon] Clicked Disney+ fullscreen button");
         state.needsFullscreenRestore = false;
         return;
       }
@@ -142,11 +124,9 @@
 
     player.requestFullscreen()
       .then(() => {
-        console.log("[Saskatoon] Fullscreen restored via requestFullscreen fallback");
         state.needsFullscreenRestore = false;
       })
-      .catch((err) => {
-        console.warn("[Saskatoon] requestFullscreen failed:", err);
+      .catch(() => {
         if (retryCount < 10) {
           setTimeout(() => restoreFullscreen(retryCount + 1), 500);
         }
@@ -171,7 +151,6 @@
           }
           if (track.mode !== "showing") {
             track.mode = "showing";
-            console.log(`[Saskatoon] Enabled subtitle track: ${track.language}`);
             return;
           }
           return; // already showing
@@ -184,12 +163,8 @@
   }
 
   function tryClickSubtitleUI() {
-    // Use the subtitleTrackPicker element directly by ID
     const picker = document.getElementById("subtitleTrackPicker");
-    if (!picker) {
-      console.warn("[Saskatoon] Could not find subtitleTrackPicker");
-      return;
-    }
+    if (!picker) return;
 
     // Find the English subtitle radio input inside the picker
     const inputs = picker.querySelectorAll('input[type="radio"]');
@@ -199,7 +174,6 @@
       const text = label ? label.textContent.trim().toLowerCase() : "";
       if (text.includes("english")) {
         input.click();
-        console.log("[Saskatoon] Selected subtitle: English");
         return;
       }
     }
@@ -207,14 +181,10 @@
     // Fallback: click the first non-off option
     for (const input of inputs) {
       if (input.value !== "off") {
-        const label = document.querySelector(`label[for="${input.id}"]`);
         input.click();
-        console.log(`[Saskatoon] Selected subtitle: ${label?.textContent.trim() || input.value}`);
         return;
       }
     }
-
-    console.warn("[Saskatoon] No subtitle options found in picker");
   }
 
   // ==========================================================
@@ -270,7 +240,6 @@
               (node.matches && node.matches(sel)) ||
               (node.querySelector && node.querySelector(sel))
             ) {
-              console.log("[Saskatoon] MutationObserver detected skip/next button via:", sel);
               tryClickNextEpisode();
               return;
             }
@@ -280,7 +249,6 @@
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
-    console.log("[Saskatoon] MutationObserver active");
   }
 
   // ==========================================================
@@ -303,7 +271,6 @@
       const video = document.querySelector(SELECTORS.videoElement);
       if (video && !video._saskatoonAttached) {
         video.addEventListener("ended", () => {
-          console.log("[Saskatoon] Video ended event fired");
           setTimeout(() => tryClickNextEpisode(), 1000);
         });
 
@@ -313,7 +280,6 @@
             if (remaining < 30) {
               rememberSubtitleState();
             }
-            // Remember fullscreen state before the transition
             if (remaining < 10 && document.fullscreenElement) {
               state.userEnteredFullscreen = true;
             }
@@ -321,34 +287,11 @@
         });
 
         video._saskatoonAttached = true;
-        console.log("[Saskatoon] Attached to <video> element");
       }
     }
 
     attachToVideo();
     setInterval(attachToVideo, 3000);
-  }
-
-  // ==========================================================
-  // Selector Validation (Debug Logging)
-  // ==========================================================
-
-  function validateSelectors() {
-    const checks = [
-      ["videoElement", SELECTORS.videoElement],
-      ["playerContainer", SELECTORS.playerContainer],
-      ["fullscreenButton", SELECTORS.fullscreenButton],
-      ["subtitlesMenuButton", SELECTORS.subtitlesMenuButton],
-    ];
-
-    for (const [name, sel] of checks) {
-      const el = queryFirst(sel);
-      if (el) {
-        console.log(`[Saskatoon] Found ${name}`);
-      } else {
-        console.warn(`[Saskatoon] Not found: ${name}`);
-      }
-    }
   }
 
   // ==========================================================
@@ -368,7 +311,7 @@
       if (stored.autoSubtitles !== undefined) CONFIG.autoSubtitles = stored.autoSubtitles;
       if (stored.subtitleLanguage) state.subtitleLanguage = stored.subtitleLanguage;
     } catch (e) {
-      console.warn("[Saskatoon] Could not load preferences:", e);
+      // Settings load failed, using defaults
     }
 
     // Listen for settings changes from popup
@@ -377,20 +320,12 @@
       if (changes.autoFullscreen) CONFIG.autoFullscreen = changes.autoFullscreen.newValue;
       if (changes.autoSubtitles) CONFIG.autoSubtitles = changes.autoSubtitles.newValue;
       if (changes.subtitleLanguage) state.subtitleLanguage = changes.subtitleLanguage.newValue;
-      console.log("[Saskatoon] Settings updated");
     });
-
-    console.log("[Saskatoon] Initializing with settings:", JSON.stringify({
-      autoNextEpisode: CONFIG.autoNextEpisode,
-      autoFullscreen: CONFIG.autoFullscreen,
-      autoSubtitles: CONFIG.autoSubtitles,
-    }));
 
     // Track fullscreen state and auto-restore on transition
     document.addEventListener("fullscreenchange", () => {
       if (document.fullscreenElement) {
         state.userEnteredFullscreen = true;
-        console.log("[Saskatoon] User entered fullscreen");
       } else if (state.userEnteredFullscreen) {
         state.userEnteredFullscreen = false;
 
@@ -401,41 +336,16 @@
                     || document.querySelector("video");
 
         if (!player) {
-          console.log("[Saskatoon] Fullscreen lost during transition, restoring automatically");
           state.needsFullscreenRestore = true;
-          // Delay to let the new player load into the DOM
           setTimeout(() => restoreFullscreen(), CONFIG.FULLSCREEN_DELAY_MS);
           setTimeout(() => tryReenableSubtitles(), CONFIG.SUBTITLE_DELAY_MS);
-        } else {
-          console.log("[Saskatoon] User manually exited fullscreen");
         }
-      }
-    });
-
-    // Handle messages from popup (e.g. fullscreen permission test)
-    browser.runtime.onMessage.addListener((message) => {
-      if (message.action === "testFullscreen") {
-        const el = document.createElement("div");
-        document.body.appendChild(el);
-        return el.requestFullscreen()
-          .then(() => {
-            document.exitFullscreen();
-            el.remove();
-            return { success: true };
-          })
-          .catch(() => {
-            el.remove();
-            return { success: false };
-          });
       }
     });
 
     setupMutationObserver();
     setupPollingFallback();
     setupVideoListener();
-
-    // Run selector validation after a delay (let the SPA render)
-    setTimeout(validateSelectors, 5000);
   }
 
   if (document.readyState === "complete") {
