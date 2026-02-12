@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Saskatoon - Setup</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0e1117;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 520px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+    .step {
+      background: #1a1d29;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: #0072d2;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .step-body {
+      padding-left: 40px;
+      color: #bbb;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    code {
+      background: #2a2d3a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 13px;
+      color: #7db8f0;
+      user-select: all;
+      cursor: pointer;
+    }
+    .copy-hint {
+      font-size: 11px;
+      color: #666;
+      margin-top: 2px;
+    }
+    .done-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 24px;
+      background: #0072d2;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .done-btn:hover {
+      background: #005fa3;
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      animation: confetti-fall 1.5s ease-out forwards;
+      z-index: 9999;
+    }
+    @keyframes confetti-fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(600px) rotate(720deg) scale(0.5); }
+    }
+    .note {
+      margin-top: 20px;
+      padding: 14px;
+      background: #1a1d29;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #777;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Saskatoon</h1>
+    <p class="subtitle">One-time Firefox setup needed for automatic fullscreen</p>
+
+    <div class="step">
+      <div class="step-header">
+        <span class="step-number">1</span>
+        <span class="step-title">Open Firefox's advanced settings</span>
+      </div>
+      <div class="step-body">
+        Copy and paste this into your address bar, then press Enter:<br>
+        <code>about:config</code><br>
+        <span class="copy-hint">Click to select, then Ctrl+C / Cmd+C to copy</span><br><br>
+        If you see a warning page, click <strong>"Accept the Risk and Continue"</strong>.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <span class="step-number">2</span>
+        <span class="step-title">Find the fullscreen setting</span>
+      </div>
+      <div class="step-body">
+        In the search bar at the top, paste this setting name:<br>
+        <code>full-screen-api.allow-trusted-requests-only</code>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <span class="step-number">3</span>
+        <span class="step-title">Set it to false</span>
+      </div>
+      <div class="step-body">
+        You should see the setting with a value of <strong>true</strong>.<br>
+        Click the toggle button (double-arrow icon) on the right to change it to <strong>false</strong>.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <span class="step-number">4</span>
+        <span class="step-title">You're all set!</span>
+      </div>
+      <div class="step-body">
+        Close the about:config tab and head to Disney+.<br>
+        Saskatoon will now automatically restore fullscreen, click next episode, and re-enable subtitles between episodes.
+      </div>
+    </div>
+
+    <button class="done-btn" id="done-btn">I've completed the setup</button>
+
+    <div class="note">
+      <strong>Why is this needed?</strong> Firefox blocks websites from entering fullscreen without a click for security. This setting allows Saskatoon to automatically restore fullscreen when Disney+ exits it during episode transitions. This is safe — it only affects the fullscreen permission, nothing else.
+    </div>
+  </div>
+
+  <script src="setup.js"></script>
+</body>
+</html>

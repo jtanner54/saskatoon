@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      color: #f9f9f9;
+      background: #1a1d29;
+    }
+    h1 {
+      font-size: 15px;
+      margin-bottom: 14px;
+      color: #f9f9f9;
+    }
+    .setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2d3a;
+    }
+    .setting:last-child { border-bottom: none; }
+    label { cursor: pointer; flex: 1; }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #555;
+      border-radius: 22px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .slider {
+      background: #0072d2;
+    }
+    .toggle input:checked + .slider::before {
+      transform: translateX(18px);
+    }
+
+    select {
+      background: #2a2d3a;
+      color: #f9f9f9;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+    .status {
+      margin-top: 12px;
+      padding: 8px;
+      background: #2a2d3a;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+    }
+
+    /* Setup screen */
+    #setup-screen {
+      display: none;
+    }
+    #settings-screen {
+      display: block;
+    }
+    .setup-title {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .setup-subtitle {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+    .setup-step {
+      background: #2a2d3a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .step-number {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      background: #0072d2;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: bold;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .step-detail {
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.5;
+      padding-left: 28px;
+    }
+    .step-detail code {
+      background: #3a3d4a;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #7db8f0;
+      user-select: all;
+    }
+    .setup-done-btn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      background: #0072d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .setup-done-btn:hover {
+      background: #005fa3;
+    }
+    .setup-warning {
+      display: none;
+      margin-top: 8px;
+      padding: 8px;
+      background: #3a2020;
+      border: 1px solid #664040;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #f09090;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Setup screen (shown on first run) -->
+  <div id="setup-screen">
+    <div class="setup-title">Welcome to Saskatoon</div>
+    <div class="setup-subtitle">One-time Firefox setup required for auto-fullscreen</div>
+
+    <div class="setup-step">
+      <div class="step-header">
+        <span class="step-number">1</span> Open Firefox settings
+      </div>
+      <div class="step-detail">
+        Type <code>about:config</code> in your address bar and press Enter.
+        Click "Accept the Risk and Continue" if prompted.
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-header">
+        <span class="step-number">2</span> Search for the setting
+      </div>
+      <div class="step-detail">
+        In the search bar, paste:<br>
+        <code>full-screen-api.allow-trusted-requests-only</code>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-header">
+        <span class="step-number">3</span> Toggle it to false
+      </div>
+      <div class="step-detail">
+        Click the toggle button on the right side to change the value
+        from <code>true</code> to <code>false</code>.
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-header">
+        <span class="step-number">4</span> Done!
+      </div>
+      <div class="step-detail">
+        Close the about:config tab. Saskatoon can now automatically
+        restore fullscreen during episode transitions.
+      </div>
+    </div>
+
+    <button class="setup-done-btn" id="setup-done-btn">I've completed the setup</button>
+    <div class="setup-warning" id="setup-warning">
+      Fullscreen test failed. Please double-check the setting is set to <code>false</code> and try again.
+    </div>
+  </div>
+
+  <!-- Normal settings screen -->
+  <div id="settings-screen">
+    <h1>Saskatoon</h1>
+
+    <div class="setting">
+      <label for="autoNext">Auto Next Episode</label>
+      <div class="toggle">
+        <input type="checkbox" id="autoNext" checked>
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="setting">
+      <label for="autoFullscreen">Re-enter Fullscreen</label>
+      <div class="toggle">
+        <input type="checkbox" id="autoFullscreen" checked>
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="setting">
+      <label for="autoSubtitles">Re-enable Subtitles</label>
+      <div class="toggle">
+        <input type="checkbox" id="autoSubtitles" checked>
+        <span class="slider"></span>
+      </div>
+    </div>
+
+    <div class="setting">
+      <label for="subtitleLang">Subtitle Language</label>
+      <select id="subtitleLang">
+        <option value="">Auto-detect</option>
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+        <option value="fr">French</option>
+        <option value="de">German</option>
+        <option value="pt">Portuguese</option>
+        <option value="ja">Japanese</option>
+        <option value="ko">Korean</option>
+      </select>
+    </div>
+
+    <div class="status" id="status-text">Active on Disney+ tabs</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
