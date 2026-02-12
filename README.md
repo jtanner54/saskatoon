@@ -20,7 +20,7 @@ After the 15th time doing this dance, I snapped and built Saskatoon. Now I just 
 
 ## Install
 
-**[Get Saskatoon on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/saskatoon/)**
+**[Get Saskatoon on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/saskatoon-disney-auto-viewer/)**
 
 ### One-Time Firefox Setup (for auto-fullscreen)
 
